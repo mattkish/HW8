@@ -1,4 +1,4 @@
-# Your name: 
+# Your name: Matt Kish
 # Your student id:
 # Your email:
 # List who you have worked with on this homework:
@@ -15,6 +15,17 @@ def load_rest_data(db):
     and each inner key is a dictionary, where the key:value pairs should be the category, 
     building, and rating for the restaurant.
     """
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM restaurants")
+    rows = cur.fetchall()
+
+    rest_data = {}
+    for row in rows:
+        rest_data[row[0]] = {'category': row[1], 'building': row[2], 'rating': row[3]}
+
+    conn.close()
+    return rest_data
     pass
 
 def plot_rest_categories(db):
