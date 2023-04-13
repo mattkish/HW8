@@ -8,6 +8,16 @@ import os
 import sqlite3
 import unittest
 
+def check_tables_in_db(db):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    print(cur.fetchall())
+    conn.close()
+
+check_tables_in_db('South_U_Restaurants.db')
+
+
 def load_rest_data(db):
     """
     This function accepts the file name of a database as a parameter and returns a nested
@@ -23,7 +33,6 @@ def load_rest_data(db):
     rest_data = {}
     for row in rows:
         rest_data[row[0]] = {'category': row[1], 'building': row[2], 'rating': row[3]}
-
     conn.close()
     return rest_data
     pass
@@ -34,6 +43,19 @@ def plot_rest_categories(db):
     restaurant categories and the values should be the number of restaurants in each category. The function should
     also create a bar chart with restaurant categories and the count of number of restaurants in each category.
     """
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute("SELECT category., COUNT(*) FROM restaurants GROUP BY category")
+    rows = cur.fetchall()
+    
+    cat_data = {row[0]: row[1] for row in rows}
+    plt.bar(cat_data.keys(), cat_data.values())
+    plt.xticks(rotation=90)
+    plt.ylabel('Number of Restaurants')
+    plt.title('Restaurant Categories')
+    plt.show()
+    conn.close()
+    return cat_data
     pass
 
 def find_rest_in_building(building_num, db):
@@ -42,6 +64,14 @@ def find_rest_in_building(building_num, db):
     restaurant names. You need to find all the restaurant names which are in the specific building. The restaurants 
     should be sorted by their rating from highest to lowest.
     '''
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute("SELECT name FROM restaurants WHERE building=? ORDER BY rating DESC", (building_num,))
+    rows = cur.fetchall()
+
+    rest_list = [row[0] for row in rows]
+    conn.close()
+    return rest_list
     pass
 
 #EXTRA CREDIT
@@ -56,10 +86,33 @@ def get_highest_rating(db): #Do this through DB as well
     The second bar chart displays the buildings along the y-axis and their ratings along the x-axis 
     in descending order (by rating).
     """
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute("SELECT category, AVG(rating) AS avg_rating FROM restaurants GROUP BY category ORDER BY avg_rating DESC")
+    cat_rows = cur.fetchall()
+    cur.execute("SELECT building, AVG(rating) AS avg_rating FROM restaurants GROUP BY building ORDER BY avg_rating DESC")
+    build_rows = cur.fetchall()
+
+    highest_rating = [cat_rows[0], build_rows[0]]
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+    ax1.barh([row[0] for row in cat_rows], [row[1] for row in cat_rows])
+    ax1.set_xlabel('Average Rating')
+    ax1.set_title('Categories')
+    ax2.barh([row[0] for row in build_rows], [row[1] for row in build_rows])
+    ax2.set_xlabel('Average Rating')
+    ax2.set_title('Buildings')
+    plt.show()
+    conn.close()
+    return highest_rating
     pass
 
 #Try calling your functions here
 def main():
+    print(load_rest_data('South_U_Restaurants.db'))
+    print(plot_rest_categories('South_U_Restaurants.db'))
+    print(find_rest_in_building(1140, 'South_U_Restaurants.db'))
+    print(get_highest_rating('South_U_Restaurants.db'))
     pass
 
 class TestHW8(unittest.TestCase):
