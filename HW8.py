@@ -19,7 +19,7 @@ def load_rest_data(db):
     """
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    cur.execute("SELECT * FROM restaurants")
+    cur.execute("SELECT r.name, c.category, b.building, r.rating FROM restaurants r INNER JOIN categories c ON r.category_id = c.id INNER JOIN buildings b ON r.building_id = b.id")
     rows = cur.fetchall()
 
     rest_data = {}
@@ -37,7 +37,7 @@ def plot_rest_categories(db):
     """
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    cur.execute("SELECT category., COUNT(*) FROM restaurants GROUP BY category")
+    cur.execute("SELECT c.category, COUNT(*) FROM restaurants r INNER JOIN categories c ON r.category_id = c.id GROUP BY c.category")
     rows = cur.fetchall()
     
     cat_data = {row[0]: row[1] for row in rows}
@@ -58,7 +58,7 @@ def find_rest_in_building(building_num, db):
     '''
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    cur.execute("SELECT name FROM restaurants WHERE building=? ORDER BY rating DESC", (building_num,))
+    cur.execute("SELECT r.name FROM restaurants r INNER JOIN buildings b ON r.building_id = b.id WHERE b.building = ? ORDER BY r.rating DESC", (building_num,))
     rows = cur.fetchall()
 
     rest_list = [row[0] for row in rows]
@@ -80,9 +80,9 @@ def get_highest_rating(db): #Do this through DB as well
     """
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    cur.execute("SELECT category, AVG(rating) AS avg_rating FROM restaurants GROUP BY category ORDER BY avg_rating DESC")
+    cur.execute("SELECT c.category, AVG(r.rating) AS avg_rating FROM restaurants r INNER JOIN categories c ON r.category_id = c.id GROUP BY c.category ORDER BY avg_rating DESC")
     cat_rows = cur.fetchall()
-    cur.execute("SELECT building, AVG(rating) AS avg_rating FROM restaurants GROUP BY building ORDER BY avg_rating DESC")
+    cur.execute("SELECT b.building, AVG(r.rating) AS avg_rating FROM restaurants r INNER JOIN buildings b ON r.building_id = b.id GROUP BY b.building ORDER BY avg_rating DESC")
     build_rows = cur.fetchall()
 
     highest_rating = [cat_rows[0], build_rows[0]]
@@ -104,7 +104,6 @@ def main():
     print(load_rest_data('South_U_Restaurants.db'))
     print(plot_rest_categories('South_U_Restaurants.db'))
     print(find_rest_in_building(1140, 'South_U_Restaurants.db'))
-    print(get_highest_rating('South_U_Restaurants.db'))
     pass
 
 class TestHW8(unittest.TestCase):
