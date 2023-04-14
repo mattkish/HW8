@@ -1,6 +1,6 @@
 # Your name: Matt Kish
-# Your student id:
-# Your email:
+# Your student id:3767 0460
+# Your email: mattkish@umich.edu
 # List who you have worked with on this homework:
 
 import matplotlib.pyplot as plt
