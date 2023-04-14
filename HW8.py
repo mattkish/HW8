@@ -8,14 +8,6 @@ import os
 import sqlite3
 import unittest
 
-def check_tables_in_db(db):
-    conn = sqlite3.connect(db)
-    cur = conn.cursor()
-    cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    print(cur.fetchall())
-    conn.close()
-
-check_tables_in_db('South_U_Restaurants.db')
 
 
 def load_rest_data(db):
