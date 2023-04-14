@@ -1,7 +1,7 @@
 # Your name: Matt Kish
 # Your student id:3767 0460
 # Your email: mattkish@umich.edu
-# List who you have worked with on this homework:
+# List who you have worked with on this homework: Andrei Mircea, Chris Lin, David Diokno
 
 import matplotlib.pyplot as plt
 import os
